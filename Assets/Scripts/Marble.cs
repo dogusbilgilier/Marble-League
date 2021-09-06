@@ -16,6 +16,8 @@ public class Marble : MonoBehaviour
     bool aiInput;
 
     public bool fin;
+
+    [SerializeField]ParticleSystem effectBoost, effectMax;
    
     void Start()
     {
@@ -46,6 +48,7 @@ public class Marble : MonoBehaviour
                 PlayerBoost();
             else
                 AIBoost();
+            PlayEffect(rb.velocity);
         }
         else
         {
@@ -74,14 +77,7 @@ public class Marble : MonoBehaviour
         yield return new WaitForSeconds(boostTime);
         stopBoost = true;
         rb.velocity = new Vector3(rb.velocity.x, -defaultSpeed);
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-       /* if (collision.transform.gameObject.CompareTag("obstacle"))
-        {
-            Debug.Log("Hit Obstacle");
-            rb.velocity = new Vector3(-rb.velocity.x, 1.3f);
-        }*/
+        
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -120,7 +116,10 @@ public class Marble : MonoBehaviour
     }
     Vector3 BoostDir()
     {
-        return Vector3.ClampMagnitude(rb.velocity * speedMult, 2);
+        Vector3 dir = Vector3.ClampMagnitude(rb.velocity * speedMult, 2);
+        //PlayEffect(dir);
+        return dir;
+
     }
     void PlayerBoost()
     {
@@ -143,9 +142,6 @@ public class Marble : MonoBehaviour
     {
         if ( stopBoost == true && cooldownComplete == true)
         {
-
-            
-
             if (aiInput == true)
             {
                 Debug.Log(aiInput + " " + name);
@@ -169,4 +165,35 @@ public class Marble : MonoBehaviour
         yield return new WaitForSeconds(3);
         rb.useGravity = true;
     }
+    void PlayEffect(Vector3 speed)
+    {
+
+        if (speed.x > 1.8f || speed.y > 1.8f ||
+            speed.x < -1.8f || speed.y < -1.8f)
+        {
+            if (effectBoost.isPlaying)
+                effectBoost.Stop();
+            if (effectMax.isStopped)
+                effectMax.Play();
+        }
+
+        else if (speed.x > 0.5f || speed.y > 0.5f ||
+           speed.x < -0.5f || speed.y < -0.5f)
+        {
+            if (effectBoost.isPlaying)
+                effectMax.Stop();
+            if (effectBoost.isStopped)
+                effectBoost.Play();
+        }
+
+        else
+        {
+            if (effectMax.isPlaying)
+                effectMax.Stop();
+            if (effectBoost.isPlaying)
+                effectBoost.Stop();
+        }
+
+    }
+
 }

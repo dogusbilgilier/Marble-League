@@ -6,29 +6,28 @@ public class Obstacle : MonoBehaviour
 {
     [SerializeField] Material matIn, matOut;
     ParticleSystem particles;
-    MeshRenderer renderer;
-    BoxCollider collider;
-    GameObject part1, part2;
+    MeshRenderer _renderer;
+    BoxCollider _collider;
     private void OnTriggerEnter(Collider other)
     {
-       renderer.material = matIn;
+        _renderer.material = matIn;
     }
     private void OnTriggerExit(Collider other)
     {
-        renderer.material = matOut;
+        _renderer.material = matOut;
     }
 
     private void Start()
     {
-        collider = GetComponent<BoxCollider>();
-        renderer = GetComponent<MeshRenderer>();
+        _collider = GetComponent<BoxCollider>();
+        _renderer = GetComponent<MeshRenderer>();
         particles = GetComponentInChildren<ParticleSystem>();
     }
 
     public void Explode()
     {
-        collider.enabled = false;
-        renderer.enabled = false;
+        _collider.enabled = false;
+        _renderer.enabled = false;
         particles.Play();
         StartCoroutine(WaitForParticleStop());
     }
@@ -37,6 +36,25 @@ public class Obstacle : MonoBehaviour
     {
         yield return new WaitForSeconds(5);
         particles.Stop();
+        ReEnable();
 
+    }
+    void ReEnable()
+    {
+        transform.localScale = new Vector3(0.051f, 0.051f, 0.001f);
+        _collider.enabled = true;
+        _renderer.enabled = true;
+        StartCoroutine(ScaleEffect());
+
+    }
+
+    IEnumerator ScaleEffect()
+    {
+        while (transform.localScale.z <= 2.21f)
+        {
+            transform.localScale += new Vector3(0, 0, 0.01f);
+            yield return new WaitForFixedUpdate();
+        }
+       
     }
 }

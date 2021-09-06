@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -53,4 +54,9 @@ public class UIManager : MonoBehaviour
         go = true;
         
     }
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
+    }
+
 }
