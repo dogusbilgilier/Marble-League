@@ -42,6 +42,7 @@ public class Obstacle : MonoBehaviour
         transform.localScale = new Vector3(startScale.x, startScale.y, 0.001f);
         _collider.enabled = true;
         _renderer.enabled = true;
+        _renderer.material = matOut;
         StartCoroutine(ScaleEffect());
 
     }

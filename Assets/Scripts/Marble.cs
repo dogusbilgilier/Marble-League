@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class Marble : MonoBehaviour
@@ -20,6 +21,7 @@ public class Marble : MonoBehaviour
    
     void Start()
     {
+        finTime = 0;
         uiManager = UIManager.inst;
         inputManager = InputManager.inst;
         rb = GetComponent<Rigidbody>();
@@ -53,6 +55,8 @@ public class Marble : MonoBehaviour
         {
             rb.velocity = Vector3.zero;
         }
+        finTime += Time.fixedDeltaTime;
+
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -62,8 +66,6 @@ public class Marble : MonoBehaviour
             {
                 other.GetComponent<Obstacle>().Explode();
             }
-
-
             else
                 StartCoroutine(ObstacleHit(other.gameObject));
 
@@ -74,6 +76,10 @@ public class Marble : MonoBehaviour
             rb.velocity = Vector3.zero;
             fin = true;
             Fin();
+        }
+        if (other.CompareTag("border"))
+        {
+            StartCoroutine(BorderHit(other.gameObject));
         }
     }
     void PlayEffect(Vector3 speed)
@@ -142,7 +148,7 @@ public class Marble : MonoBehaviour
     }
     void RandomiseAIinput()
     {
-        aiInput = (Random.Range(0f, 1f) > 0.5f);
+        aiInput = UnityEngine.Random.Range(0f, 1f) > UnityEngine.Random.Range(0.2f, 0.7f);
     }
     void SpeedLimit()
     {
@@ -183,7 +189,16 @@ public class Marble : MonoBehaviour
     IEnumerator ObstacleHit(GameObject obs)
     {
         Vector3 dir = -rb.velocity*3;
-        while (Vector3.Distance(transform.position, obs.transform.position) <= 0.15f)
+        while (Vector3.Distance(transform.position, obs.transform.position) <= 0.25f)
+        {
+            yield return new WaitForFixedUpdate();
+            rb.velocity = dir;
+        }
+    }
+    IEnumerator BorderHit(GameObject obs)
+    {
+        Vector3 dir = -rb.velocity * 3;
+        while (Mathf.Abs(transform.position.x- obs.transform.position.x) <= 1f)
         {
             yield return new WaitForFixedUpdate();
             rb.velocity = dir;
@@ -197,14 +212,15 @@ public class Marble : MonoBehaviour
 
     void Fin()
     {
-        finTime = Time.time;
 
         if (CompareTag("player"))
         {
             uiManager.fin.SetActive(true);
             name = "Me";
         }
-        uiManager.AddList(name, finTime.ToString());
+        string finTimeStr = String.Format("{0:0.00}", finTime);
+        uiManager.AddList(name, finTimeStr);
+        finTime = 0;
     }
 
 }

@@ -8,6 +8,7 @@ TagManager:
   - player
   - ai
   - fin
+  - border
   layers:
   - Default
   - TransparentFX
