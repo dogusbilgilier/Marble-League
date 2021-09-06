@@ -1,14 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
     [SerializeField] Transform player;
+
     Vector3 desiredPosition;
+
     [Range(0, 1)]
     public float takipX, takipY;
     public float offsetY;
+
     float x, y, z;
 
     void FixedUpdate()

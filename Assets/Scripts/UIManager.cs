@@ -8,23 +8,30 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager inst;
     public static bool go;
+
+    int countDown;
+    int index;
+
     public Image marbleCooldown;
+    public GameObject fin;
+
     [SerializeField] GameObject playerMarble;
     [SerializeField] TextMeshProUGUI countDownTxt;
-    public bool startCooldown;
-    public float fillamount=0;
-    public float cooldownTime;
-    int countDown;
+
+    [HideInInspector] public bool startCooldown;
+    [HideInInspector] public float fillamount = 0;
+    [HideInInspector] public float cooldownTime;
+    [SerializeField] GameObject[] lines;
 
     void Start()
     {
+        index = 0;
         inst = this;
 
         go = false;
         countDown = 3;
         StartCoroutine(CountDown());
     }
-
     void Update()
     {
         if (startCooldown)
@@ -39,7 +46,6 @@ public class UIManager : MonoBehaviour
             } 
         }
     }
-
     IEnumerator CountDown()
     {
         while (countDown > 0)
@@ -57,6 +63,12 @@ public class UIManager : MonoBehaviour
     public void Restart()
     {
         SceneManager.LoadScene(0);
+    }
+    public void AddList(string name,string time)
+    {
+        lines[index].transform.GetChild(0).GetComponent<Text>().text = name;
+        lines[index].transform.GetChild(1).GetComponent<Text>().text = time;
+        index++;
     }
 
 }

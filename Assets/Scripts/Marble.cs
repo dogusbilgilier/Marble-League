@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Marble : MonoBehaviour
@@ -55,30 +54,6 @@ public class Marble : MonoBehaviour
             rb.velocity = Vector3.zero;
         }
     }
-    IEnumerator Boost(Vector3 dir)
-    {
-        stopBoost = false;
-        cooldownComplete = false;
-        while (!stopBoost)
-        {
-            isboost = true;
-            yield return new WaitForFixedUpdate();
-            rb.velocity = dir;
-        }
-        isboost = false;
-    }
-    IEnumerator Cooldown()
-    {
-        yield return new WaitForSeconds(totalCooldown);
-        cooldownComplete = true; inputManager.boost = false;
-    }
-    IEnumerator StopBoost()
-    {
-        yield return new WaitForSeconds(boostTime);
-        stopBoost = true;
-        rb.velocity = new Vector3(rb.velocity.x, -defaultSpeed);
-        
-    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("obstacle"))
@@ -87,7 +62,7 @@ public class Marble : MonoBehaviour
             {
                 other.GetComponent<Obstacle>().Explode();
             }
-                
+
 
             else
                 StartCoroutine(ObstacleHit(other.gameObject));
@@ -98,72 +73,8 @@ public class Marble : MonoBehaviour
             rb.useGravity = false;
             rb.velocity = Vector3.zero;
             fin = true;
-            
+            Fin();
         }
-    }
-    IEnumerator ObstacleHit(GameObject obs)
-    {
-        Vector3 dir = -rb.velocity*3;
-        while (Vector3.Distance(transform.position, obs.transform.position) <= 0.15f)
-        {
-            yield return new WaitForFixedUpdate();
-            rb.velocity = dir;
-        }
-    }
-    void SpeedLimit()
-    {
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity, defaultSpeed);
-    }
-    Vector3 BoostDir()
-    {
-        Vector3 dir = Vector3.ClampMagnitude(rb.velocity * speedMult, 2);
-        //PlayEffect(dir);
-        return dir;
-
-    }
-    void PlayerBoost()
-    {
-        if (inputManager.boost && stopBoost == true && cooldownComplete == true)
-        {
-
-            StartCoroutine(Boost(BoostDir()));
-            StartCoroutine(StopBoost());
-            StartCoroutine(Cooldown());
-            
-            uiManager.startCooldown = true;
-
-        }
-        if (!isboost)
-        {
-            SpeedLimit();
-        }
-    }
-    void AIBoost()
-    {
-        if ( stopBoost == true && cooldownComplete == true)
-        {
-            if (aiInput == true)
-            {
-                Debug.Log(aiInput + " " + name);
-                StartCoroutine(Boost(BoostDir()));
-                StartCoroutine(StopBoost());
-                StartCoroutine(Cooldown());
-            }
-            
-        }
-        if (!isboost)
-        {
-            SpeedLimit();
-        }
-    }
-    void RandomiseAIinput()
-    {
-        aiInput = (Random.Range(0f, 1f) > 0.5f);
-    }
-    IEnumerator Go()
-    {
-        yield return new WaitForSeconds(3);
-        rb.useGravity = true;
     }
     void PlayEffect(Vector3 speed)
     {
@@ -194,6 +105,106 @@ public class Marble : MonoBehaviour
                 effectBoost.Stop();
         }
 
+    }
+    void PlayerBoost()
+    {
+        if (inputManager.boost && stopBoost == true && cooldownComplete == true)
+        {
+
+            StartCoroutine(Boost(BoostDir()));
+            StartCoroutine(StopBoost());
+            StartCoroutine(Cooldown());
+
+            uiManager.startCooldown = true;
+
+        }
+        if (!isboost)
+        {
+            SpeedLimit();
+        }
+    }
+    void AIBoost()
+    {
+        if (stopBoost == true && cooldownComplete == true)
+        {
+            if (aiInput == true)
+            {
+                StartCoroutine(Boost(BoostDir()));
+                StartCoroutine(StopBoost());
+                StartCoroutine(Cooldown());
+            }
+
+        }
+        if (!isboost)
+        {
+            SpeedLimit();
+        }
+    }
+    void RandomiseAIinput()
+    {
+        aiInput = (Random.Range(0f, 1f) > 0.5f);
+    }
+    void SpeedLimit()
+    {
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, defaultSpeed);
+    }
+    Vector3 BoostDir()
+    {
+        Vector3 dir = Vector3.ClampMagnitude(rb.velocity * speedMult, 2);
+        //PlayEffect(dir);
+        return dir;
+
+    }
+
+    IEnumerator Boost(Vector3 dir)
+    {
+        stopBoost = false;
+        cooldownComplete = false;
+        while (!stopBoost)
+        {
+            isboost = true;
+            yield return new WaitForFixedUpdate();
+            rb.velocity = dir;
+        }
+        isboost = false;
+    }
+    IEnumerator Cooldown()
+    {
+        yield return new WaitForSeconds(totalCooldown);
+        cooldownComplete = true; inputManager.boost = false;
+    }
+    IEnumerator StopBoost()
+    {
+        yield return new WaitForSeconds(boostTime);
+        stopBoost = true;
+        rb.velocity = new Vector3(rb.velocity.x, -defaultSpeed);
+        
+    }
+    IEnumerator ObstacleHit(GameObject obs)
+    {
+        Vector3 dir = -rb.velocity*3;
+        while (Vector3.Distance(transform.position, obs.transform.position) <= 0.15f)
+        {
+            yield return new WaitForFixedUpdate();
+            rb.velocity = dir;
+        }
+    }
+    IEnumerator Go()
+    {
+        yield return new WaitForSeconds(3);
+        rb.useGravity = true;
+    }
+
+    void Fin()
+    {
+        finTime = Time.time;
+
+        if (CompareTag("player"))
+        {
+            uiManager.fin.SetActive(true);
+            name = "Me";
+        }
+        uiManager.AddList(name, finTime.ToString());
     }
 
 }

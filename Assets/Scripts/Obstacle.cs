@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Obstacle : MonoBehaviour
@@ -8,6 +7,7 @@ public class Obstacle : MonoBehaviour
     ParticleSystem particles;
     MeshRenderer _renderer;
     BoxCollider _collider;
+    Vector3 startScale;
     private void OnTriggerEnter(Collider other)
     {
         _renderer.material = matIn;
@@ -16,14 +16,13 @@ public class Obstacle : MonoBehaviour
     {
         _renderer.material = matOut;
     }
-
     private void Start()
     {
+        startScale = transform.localScale;
         _collider = GetComponent<BoxCollider>();
         _renderer = GetComponent<MeshRenderer>();
         particles = GetComponentInChildren<ParticleSystem>();
     }
-
     public void Explode()
     {
         _collider.enabled = false;
@@ -31,7 +30,6 @@ public class Obstacle : MonoBehaviour
         particles.Play();
         StartCoroutine(WaitForParticleStop());
     }
-
     IEnumerator WaitForParticleStop()
     {
         yield return new WaitForSeconds(5);
@@ -41,18 +39,17 @@ public class Obstacle : MonoBehaviour
     }
     void ReEnable()
     {
-        transform.localScale = new Vector3(0.051f, 0.051f, 0.001f);
+        transform.localScale = new Vector3(startScale.x, startScale.y, 0.001f);
         _collider.enabled = true;
         _renderer.enabled = true;
         StartCoroutine(ScaleEffect());
 
     }
-
     IEnumerator ScaleEffect()
     {
-        while (transform.localScale.z <= 2.21f)
+        while (transform.localScale.z <= startScale.z)
         {
-            transform.localScale += new Vector3(0, 0, 0.01f);
+            transform.localScale += new Vector3(0, 0, 0.08f);
             yield return new WaitForFixedUpdate();
         }
        
